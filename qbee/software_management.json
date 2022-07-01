@@ -35,7 +35,7 @@
             "parameters": [
                 {
                     "key": "mqtt_topic",
-                    "value": "qbee_modbus/Temperature"
+                    "value": "qbee/Temperature"
                 },
                 {
                     "key": "plot_server_port",
