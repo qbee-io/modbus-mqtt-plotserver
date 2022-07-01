@@ -1,0 +1,11 @@
+[Unit]
+Description=plot_server service
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 -m plot_server --cfg=/etc/plotserver/param.cfg
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target

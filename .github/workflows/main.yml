@@ -1,0 +1,104 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches: [ main ]
+    tags:
+      - '*'
+  pull_request:
+    branches: [ main ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    env:
+      qbee_upload_folder: modbus-mqtt-plotserver
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      # Resolve package details
+      - name: Resolve package details
+        id: resolve-package-details
+        run: |
+
+          #PKG_VERSION=$(git log -n 1 --date=format:%Y%m%d --pretty=0.0.0~git%cd.%h)
+          PKG_VERSION="0.0.$(date +%s)"
+          #DEPLOYMENT_GROUP="${{ secrets.QBEE_GROUP_ID_DEV }}"
+          DEPLOYMENT_GROUP="${{ secrets.QBEE_DEVICE_ID }}"
+          if [[ ${{ github.ref_type }} == "tag" ]]; then
+            PKG_VERSION=$(git describe --abbrev=0 --tags)
+            # Deploy to prod on tag
+            DEPLOYMENT_GROUP="${{ secrets.QBEE_DEVICE_ID }}"
+          fi
+
+          PKG_NAME=$(basename ${{ github.repository }})
+          PKG_ARCH="all"
+          #$(dpkg --print-architecture)
+          
+          #plotserver
+          PLOTSERVER_VERSION="0.0.1"
+
+
+          echo "::set-output name=PKG_VERSION::$PKG_VERSION"
+          echo "::set-output name=PKG_NAME::$PKG_NAME"
+          echo "::set-output name=PKG_ARCH::$PKG_ARCH"
+          echo "::set-output name=PKG_FILENAME::${PKG_NAME}_${PKG_VERSION}_${PKG_ARCH}.deb"
+          echo "::set-output name=PLOTSERVER_PKG_FILENAME::plotserver_${PLOTSERVER_VERSION}_${PKG_ARCH}.deb"
+          echo "::set-output name=PLOTSERVER_VERSION::${PLOTSERVER_VERSION}"
+          echo "::set-output name=DEPLOYMENT_GROUP::$DEPLOYMENT_GROUP"
+
+      # create plotserver deb package
+      - name: package plotserver
+        uses: bpicode/github-action-fpm@v0.9.2
+        with:
+          fpm_args: "--version ${{ steps.resolve-package-details.outputs.PLOTSERVER_VERSION }} --architecture ${{ steps.resolve-package-details.outputs.PKG_ARCH }}"
+          fpm_opts: "-s dir -t deb -n plotserver -d python3-pip --after-install ./plotserver/after-install.sh -C ./plotserver etc"
+
+
+      - name: qbee.io authentication
+        id: qbee-auth
+        uses: qbee-io/authenticate-action@v1
+        with:
+          login: ${{ secrets.QBEE_USER }}
+          password: ${{ secrets.QBEE_PW }}
+
+      - name: qbee.io file upload deb package
+        uses: qbee-io/file-upload-action@v1.2
+        with:
+          token: ${{ steps.qbee-auth.outputs.token }}
+          filename: ${{ steps.resolve-package-details.outputs.PLOTSERVER_PKG_FILENAME }}
+          qbee_directory: ${{ env.qbee_upload_folder }}
+          local_directory: '.'
+
+      - name: qbee.io file upload deb package
+        uses: qbee-io/file-upload-action@v1.2
+        with:
+          token: ${{ steps.qbee-auth.outputs.token }}
+          filename: param.cfg.template
+          qbee_directory: ${{ env.qbee_upload_folder }}
+          local_directory: 'plotserver/config'
+
+      - name: qbee.io software management
+        uses: qbee-io/software-management-action@v0.4
+        with:
+         token: ${{ steps.qbee-auth.outputs.token }}
+         config_file: 'qbee/software_management.json'
+         package_name: ${{ steps.resolve-package-details.outputs.PLOTSERVER_PKG_FILENAME }}
+         mode: 'replace'
+         device_or_group_id: ${{ steps.resolve-package-details.outputs.DEPLOYMENT_GROUP }}
+         commit_message: 'uploading content from GitHub'

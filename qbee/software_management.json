@@ -1,0 +1,29 @@
+{
+    "enabled": true,
+    "items": [
+        {
+            "package": "/modbus-mqtt-plotserver/plotserver_0.0.1_all.deb",
+            "config_files": [
+                {
+                    "config_template": "/modbus-mqtt-plotserver/plotserver/param.cfg.template",
+                    "config_location": "/etc/plotserver/param.cfg"
+                }
+            ],
+            "parameters": [
+                {
+                    "key": "host",
+                    "value": "0.0.0.0"
+                },
+                {
+                    "key": "port",
+                    "value": "8080"
+                },
+                {
+                    "key": "max-points",
+                    "value": "100"
+                }
+            ]
+        }
+    ],
+    "version": "v1"
+}
