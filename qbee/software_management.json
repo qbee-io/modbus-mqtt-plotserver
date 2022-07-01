@@ -2,7 +2,7 @@
     "enabled": true,
     "items": [
         {
-            "package": "/modbus-mqtt-plotserver/plotserver_0.0.1_all.deb",
+            "package": "/modbus-mqtt-plotserver/plotserver/plotserver_0.0.1_all.deb",
             "config_files": [
                 {
                     "config_template": "/modbus-mqtt-plotserver/plotserver/param.cfg.template",

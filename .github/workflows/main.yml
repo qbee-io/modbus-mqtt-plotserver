@@ -82,7 +82,7 @@ jobs:
         with:
           token: ${{ steps.qbee-auth.outputs.token }}
           filename: ${{ steps.resolve-package-details.outputs.PLOTSERVER_PKG_FILENAME }}
-          qbee_directory: ${{ env.qbee_upload_folder }}
+          qbee_directory: ${{ env.qbee_upload_folder }}/plotserver
           local_directory: '.'
 
       - name: qbee.io file upload deb package
@@ -90,7 +90,7 @@ jobs:
         with:
           token: ${{ steps.qbee-auth.outputs.token }}
           filename: param.cfg.template
-          qbee_directory: ${{ env.qbee_upload_folder }}
+          qbee_directory: ${{ env.qbee_upload_folder }}/plotserver
           local_directory: 'plotserver/config'
 
       - name: qbee.io software management
