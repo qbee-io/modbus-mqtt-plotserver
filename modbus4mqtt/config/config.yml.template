@@ -1,0 +1,28 @@
+#MQTT settings
+mqtt:
+  #The hostname or IP address of the MQTT server
+  hostname: {{MQTT_HOSTNAME}}
+  #The port of the MQTT server
+  port: 1883
+  #The username to authenticate to the MQTT server
+  username: {{MQTT_USERNAME}}
+  #The password to authenticate to the MQTT server
+  password: {{MQTT_PASSWORD}}
+  #A prefix for published MQTT topics
+  mqtt_topic_prefix: 'qbee'
+
+#The YAML config file for your modbus device
+config: {{MODBUS_CONFIG_FILE}}
+
+#Security settings
+security:
+  #Configure network encryption and authentication options. Enables SSL/TLS.
+  use_tls: False
+  #Do not check that the server certificate hostname matches the remote hostname
+  insecure: True
+  #The path to a file containing trusted CA certificates to enable encryption
+  cafile: null
+  #Client certificate for authentication, if required by server
+  cert: null
+  #Client private key for authentication, if required by server
+  key: null

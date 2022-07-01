@@ -53,6 +53,7 @@ jobs:
           #plotserver
           PLOTSERVER_VERSION="0.0.1"
           MQTT2PLOTSERVER_VERSION="0.0.1"
+          MODBUS4MQTT_VERSION="0.0.1"
 
 
           echo "::set-output name=PKG_VERSION::$PKG_VERSION"
@@ -63,6 +64,8 @@ jobs:
           echo "::set-output name=PLOTSERVER_VERSION::${PLOTSERVER_VERSION}"
           echo "::set-output name=MQTT2PLOTSERVER_PKG_FILENAME::mqtt2plotserver_${MQTT2PLOTSERVER_VERSION}_${PKG_ARCH}.deb"
           echo "::set-output name=MQTT2PLOTSERVER_VERSION::${MQTT2PLOTSERVER_VERSION}"
+          echo "::set-output name=MODBUS4MQTT_PKG_FILENAME::modbus4mqtt_${MODBUS4MQTT_VERSION}_${PKG_ARCH}.deb"
+          echo "::set-output name=MODBUS4MQTT_VERSION::${MODBUS4MQTT_VERSION}"
           echo "::set-output name=DEPLOYMENT_GROUP::$DEPLOYMENT_GROUP"
 
       # create plotserver deb package
@@ -79,7 +82,15 @@ jobs:
           fpm_args: "--version ${{ steps.resolve-package-details.outputs.MQTT2PLOTSERVER_VERSION }} --architecture ${{ steps.resolve-package-details.outputs.PKG_ARCH }}"
           fpm_opts: "-s dir -t deb -n mqtt2plotserver -d python3-pip -d mosquitto --after-install ./mqtt2plotserver/after-install.sh -C ./mqtt2plotserver etc usr"
 
+      # create modbus4mqtt deb package
+      - name: package modbus4mqtt
+        uses: bpicode/github-action-fpm@v0.9.2
+        with:
+          fpm_args: "--version ${{ steps.resolve-package-details.outputs.MODBUS4MQTT_VERSION }} --architecture ${{ steps.resolve-package-details.outputs.PKG_ARCH }}"
+          fpm_opts: "-s dir -t deb -n modbus4mqtt -d python3-pip --after-install ./modbus4mqtt/after-install.sh -C ./modbus4mqtt etc usr"
 
+
+      ### QBEE AUTH ####
       - name: qbee.io authentication
         id: qbee-auth
         uses: qbee-io/authenticate-action@v1
@@ -87,6 +98,7 @@ jobs:
           login: ${{ secrets.QBEE_USER }}
           password: ${{ secrets.QBEE_PW }}
 
+      ### PLOTSERVER UPLOAD ####
       - name: qbee.io file upload plotserver deb package
         uses: qbee-io/file-upload-action@v1.2
         with:
@@ -103,6 +115,7 @@ jobs:
           qbee_directory: ${{ env.qbee_upload_folder }}/plotserver
           local_directory: 'plotserver/config'
 
+      ### MQTT2PLOTSERVER UPLOAD ####
       - name: qbee.io file upload mqtt2plotserver deb package
         uses: qbee-io/file-upload-action@v1.2
         with:
@@ -111,7 +124,7 @@ jobs:
           qbee_directory: ${{ env.qbee_upload_folder }}/mqtt2plotserver
           local_directory: '.'
 
-      - name: qbee.io file upload plotserver config
+      - name: qbee.io file upload mqtt2plotserver config
         uses: qbee-io/file-upload-action@v1.2
         with:
           token: ${{ steps.qbee-auth.outputs.token }}
@@ -119,6 +132,32 @@ jobs:
           qbee_directory: ${{ env.qbee_upload_folder }}/mqtt2plotserver
           local_directory: 'mqtt2plotserver/config'
 
+      ### MODBUS4MQTT UPLOAD ####
+      - name: qbee.io file upload modbus4mqtt deb package
+        uses: qbee-io/file-upload-action@v1.2
+        with:
+          token: ${{ steps.qbee-auth.outputs.token }}
+          filename: ${{ steps.resolve-package-details.outputs.MODBUS4MQTT_PKG_FILENAME }}
+          qbee_directory: ${{ env.qbee_upload_folder }}/modbus4mqtt
+          local_directory: '.'
+
+      - name: qbee.io file upload modbus4mqtt main config
+        uses: qbee-io/file-upload-action@v1.2
+        with:
+          token: ${{ steps.qbee-auth.outputs.token }}
+          filename: config.yml.template
+          qbee_directory: ${{ env.qbee_upload_folder }}/modbus4mqtt
+          local_directory: 'modbus4mqtt/config'
+
+      - name: qbee.io file upload modbus4mqtt modbus config
+        uses: qbee-io/file-upload-action@v1.2
+        with:
+          token: ${{ steps.qbee-auth.outputs.token }}
+          filename: temp_sensor.yml
+          qbee_directory: ${{ env.qbee_upload_folder }}/modbus4mqtt
+          local_directory: 'modbus4mqtt/config'
+
+      ### QBEE CONFIG ####
       - name: qbee.io software management
         uses: qbee-io/software-management-action@v0.4
         with:

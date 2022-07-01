@@ -42,6 +42,29 @@
                     "value": "8080"
                 }
             ]
+        },
+        {
+            "package": "/modbus-mqtt-plotserver/modbus4mqtt/modbus4mqtt_0.0.1_all.deb",
+            "config_files": [
+                {
+                    "config_template": "/modbus-mqtt-plotserver/modbus4mqtt/config.yml.template",
+                    "config_location": "/etc/modbus4mqtt/config.yml"
+                },
+                {
+                    "config_template": "/modbus-mqtt-plotserver/modbus4mqtt/temp_sensor.yml",
+                    "config_location": "/etc/modbus4mqtt/temp_sensor.yml"
+                }
+            ],
+            "parameters": [
+                {
+                    "key": "MQTT_HOSTNAME",
+                    "value": "localhost"
+                },
+                {
+                    "key": "MODBUS_CONFIG_FILE",
+                    "value": "/etc/modbus4mqtt/temp_sensor.yml"
+                }
+            ]
         }
     ],
     "version": "v1"

@@ -1,0 +1,28 @@
+ip: "192.168.100.166"
+port: 502
+update_rate: 5
+address_offset: 0
+scan_batching: 1
+registers:
+  - pub_topic: "Temperature"
+    json_key: "Temperature"
+    type: "uint16"
+    address: 4003
+    table: "holding"
+    pub_only_on_change: false
+    scale: 0.1
+    #  - pub_topic: "Temperature"
+    #    json_key: "temp_int"
+    #    type: "uint16"
+    #    address: 4004
+    #    table: "holding"
+    #    pub_only_on_change: false
+    #    scale: 1
+    #  - pub_topic: "Temperature"
+    #    json_key: "temp_dec"
+    #    type: "uint16"
+    #    address: 4005
+    #    table: "holding"
+    #    pub_only_on_change: false
+    #    scale: 1
+    #

@@ -1,0 +1,11 @@
+[Unit]
+Description=modbus4mqtt
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /usr/local/bin/run_modbus4mqtt.py
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target
