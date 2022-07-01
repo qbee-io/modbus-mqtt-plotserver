@@ -23,6 +23,25 @@
                     "value": "100"
                 }
             ]
+        },
+        {
+            "package": "/modbus-mqtt-plotserver/mqtt2plotserver/mqtt2plotserver_0.0.1_all.deb",
+            "config_files": [
+                {
+                    "config_template": "/modbus-mqtt-plotserver/mqtt2plotserver/config.yml.template",
+                    "config_location": "/etc/mqtt2plotserver/config.yml"
+                }
+            ],
+            "parameters": [
+                {
+                    "key": "mqtt_topic",
+                    "value": "qbee_modbus/Temperature"
+                },
+                {
+                    "key": "plot_server_port",
+                    "value": "8080"
+                }
+            ]
         }
     ],
     "version": "v1"

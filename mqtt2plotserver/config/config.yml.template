@@ -1,0 +1,6 @@
+mqtt:
+    user: {{mqtt_user}}
+    password: {{mqtt_password}}
+    topic: {{mqtt_topic}}
+plot_server:
+    port: {{plot_server_port}}
