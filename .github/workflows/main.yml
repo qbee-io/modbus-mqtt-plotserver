@@ -35,38 +35,21 @@ jobs:
       - name: Resolve package details
         id: resolve-package-details
         run: |
-
-          #PKG_VERSION=$(git log -n 1 --date=format:%Y%m%d --pretty=0.0.0~git%cd.%h)
-          PKG_VERSION="0.0.$(date +%s)"
-          #DEPLOYMENT_GROUP="${{ secrets.QBEE_GROUP_ID_DEV }}"
-          DEPLOYMENT_GROUP="${{ secrets.QBEE_DEVICE_ID }}"
-          if [[ ${{ github.ref_type }} == "tag" ]]; then
-            PKG_VERSION=$(git describe --abbrev=0 --tags)
-            # Deploy to prod on tag
-            DEPLOYMENT_GROUP="${{ secrets.QBEE_DEVICE_ID }}"
-          fi
-
-          PKG_NAME=$(basename ${{ github.repository }})
+          # package architecture
           PKG_ARCH="all"
-          #$(dpkg --print-architecture)
 
-          #plotserver
+          # package versions
           PLOTSERVER_VERSION="0.0.1"
           MQTT2PLOTSERVER_VERSION="0.0.1"
           MODBUS4MQTT_VERSION="0.0.1"
 
-
-          echo "::set-output name=PKG_VERSION::$PKG_VERSION"
-          echo "::set-output name=PKG_NAME::$PKG_NAME"
           echo "::set-output name=PKG_ARCH::$PKG_ARCH"
-          echo "::set-output name=PKG_FILENAME::${PKG_NAME}_${PKG_VERSION}_${PKG_ARCH}.deb"
           echo "::set-output name=PLOTSERVER_PKG_FILENAME::plotserver_${PLOTSERVER_VERSION}_${PKG_ARCH}.deb"
           echo "::set-output name=PLOTSERVER_VERSION::${PLOTSERVER_VERSION}"
           echo "::set-output name=MQTT2PLOTSERVER_PKG_FILENAME::mqtt2plotserver_${MQTT2PLOTSERVER_VERSION}_${PKG_ARCH}.deb"
           echo "::set-output name=MQTT2PLOTSERVER_VERSION::${MQTT2PLOTSERVER_VERSION}"
           echo "::set-output name=MODBUS4MQTT_PKG_FILENAME::modbus4mqtt_${MODBUS4MQTT_VERSION}_${PKG_ARCH}.deb"
           echo "::set-output name=MODBUS4MQTT_VERSION::${MODBUS4MQTT_VERSION}"
-          echo "::set-output name=DEPLOYMENT_GROUP::$DEPLOYMENT_GROUP"
 
       # create plotserver deb package
       - name: package plotserver
@@ -165,5 +148,5 @@ jobs:
          config_file: 'qbee/software_management.json'
          package_name: ${{ steps.resolve-package-details.outputs.PLOTSERVER_PKG_FILENAME }}
          mode: 'replace'
-         device_or_group_id: ${{ steps.resolve-package-details.outputs.DEPLOYMENT_GROUP }}
+         device_or_group_id: ${{ secrets.QBEE_DEVICE_ID }}
          commit_message: 'uploading content from GitHub'
